@@ -9,7 +9,6 @@ app.use(cors());
 app.use(express.json());
 
 const API_KEY = process.env.VEO3_API_KEY;
-
 const API_URL = "https://pollo.ai/api/platform/generation/google/veo3";
 const STATUS_URL = "https://pollo.ai/api/platform/status";
 
@@ -29,7 +28,7 @@ app.post("/api/generate", async (req, res) => {
       },
       body: JSON.stringify({
         input: {
-          image: "", // 目前没有图片上传，传空字符串
+          image: "", // 暂不支持上传图片
           prompt,
           negativePrompt,
           length,
@@ -54,7 +53,7 @@ app.get("/api/status", async (req, res) => {
   if (!taskId) return res.status(400).json({ error: "缺少 taskId 参数" });
 
   try {
-    const polloRes = await fetch(\`\${STATUS_URL}?taskId=\${taskId}\`, {
+    const polloRes = await fetch(`${STATUS_URL}?taskId=${taskId}`, {
       method: "GET",
       headers: {
         "x-api-key": API_KEY
@@ -70,4 +69,4 @@ app.get("/api/status", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(\`✅ Veo3 后端运行中：http://localhost:\${PORT}\`));
+app.listen(PORT, () => console.log(`✅ Veo3 后端运行中：http://localhost:${PORT}`));
