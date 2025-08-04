@@ -1,6 +1,6 @@
 
-const API_BASconst API_BASE = "https://veo3-chat-app-production.up.railway.app";
-// 替换为你的后端地址
+const API_BASE = "https://veo3-chat-app-production.up.railway.app";
+
 
 function appendMsg(content) {
   const div = document.createElement("div");
