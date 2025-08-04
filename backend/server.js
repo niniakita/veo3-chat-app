@@ -1,3 +1,4 @@
+
 import express from "express";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
@@ -9,6 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 const API_KEY = process.env.VEO3_API_KEY;
+
 const API_URL = "https://pollo.ai/api/platform/generation/google/veo3";
 const STATUS_URL = "https://pollo.ai/api/platform/status";
 
@@ -28,7 +30,7 @@ app.post("/api/generate", async (req, res) => {
       },
       body: JSON.stringify({
         input: {
-          image: "", // 暂不支持上传图片
+          image: "",
           prompt,
           negativePrompt,
           length,
