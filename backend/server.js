@@ -9,14 +9,19 @@ app.use(cors());
 app.use(express.json());
 
 const API_KEY = process.env.VEO3_API_KEY;
-const API_URL = process.env.VEO3_API_URL;
 
-const taskMap = new Map(); // 用于存储 taskId 与生成结果
+const API_URL = "https://pollo.ai/api/platform/generation/google/veo3";
+const STATUS_URL = "https://pollo.ai/api/platform/status";
 
 app.post("/api/generate", async (req, res) => {
-  const { prompt, resolution = "720p", length = 8 } = req.body;
+  const { prompt, negativePrompt = "", resolution = "1080p", length = 8, generateAudio = true } = req.body;
+
+  if (!prompt) {
+    return res.status(400).json({ error: "缺少提示词 prompt" });
+  }
+
   try {
-    const response = await fetch(API_URL, {
+    const polloRes = await fetch(API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -24,40 +29,45 @@ app.post("/api/generate", async (req, res) => {
       },
       body: JSON.stringify({
         input: {
+          image: "", // 目前没有图片上传，传空字符串
           prompt,
-          resolution,
+          negativePrompt,
           length,
           aspectRatio: "16:9",
-          generateAudio: true
+          resolution,
+          seed: 123,
+          generateAudio
         }
       })
     });
-    const data = await response.json();
-    if (data.taskId) {
-      taskMap.set(data.taskId, { status: "waiting" });
-      res.json({ taskId: data.taskId });
-    } else {
-      res.status(500).json({ error: "任务创建失败", detail: data });
-    }
+
+    const data = await polloRes.json();
+    res.json(data);
   } catch (err) {
-    res.status(500).json({ error: "接口调用失败", message: err.message });
+    console.error("生成任务失败：", err);
+    res.status(500).json({ error: "生成失败" });
   }
 });
 
 app.get("/api/status", async (req, res) => {
   const { taskId } = req.query;
-  if (!taskId) return res.status(400).json({ error: "缺少 taskId" });
+  if (!taskId) return res.status(400).json({ error: "缺少 taskId 参数" });
 
   try {
-    const pollRes = await fetch(`https://pollo.ai/api/platform/task/${taskId}`, {
-      headers: { "x-api-key": API_KEY }
+    const polloRes = await fetch(\`\${STATUS_URL}?taskId=\${taskId}\`, {
+      method: "GET",
+      headers: {
+        "x-api-key": API_KEY
+      }
     });
-    const data = await pollRes.json();
+
+    const data = await polloRes.json();
     res.json(data);
   } catch (err) {
-    res.status(500).json({ error: "轮询失败", message: err.message });
+    console.error("查询状态失败：", err);
+    res.status(500).json({ error: "查询失败" });
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Veo3 后端已启动：http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(\`✅ Veo3 后端运行中：http://localhost:\${PORT}\`));
