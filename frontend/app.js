@@ -1,70 +1,44 @@
-const API_BASE = "https://veo3-chat-app-production.up.railway.app";
-const chatBox = document.getElementById("chatBox");
-const input = document.getElementById("userInput");
-const sendBtn = document.getElementById("sendBtn");
-const clearBtn = document.getElementById("clearBtn");
 
-let chatHistory = JSON.parse(localStorage.getItem("chatHistory") || "[]");
-renderChatHistory();
+const API_BASE = "https://veo3-chat-app-production.up.railway.app"; // 替换为你的后端地址
 
-function appendMessage(role, text) {
-  const messageEl = document.createElement("div");
-  messageEl.className = `message ${role}`;
-  const bubble = document.createElement("div");
-  bubble.className = "bubble";
-  bubble.textContent = text;
-  messageEl.appendChild(bubble);
-  chatBox.appendChild(messageEl);
-  chatBox.scrollTop = chatBox.scrollHeight;
-  return bubble;
+function appendMsg(content) {
+  const div = document.createElement("div");
+  div.textContent = content;
+  document.getElementById("chat").appendChild(div);
 }
 
-sendBtn.addEventListener("click", sendMessage);
-input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
-});
-clearBtn.addEventListener("click", clearChat);
+async function generate() {
+  const prompt = document.getElementById("prompt").value;
+  const resolution = document.getElementById("resolution").value;
+  const length = parseInt(document.getElementById("length").value);
+  if (!prompt) return alert("请输入内容");
 
-function sendMessage() {
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = "";
-  chatHistory.push({ role: "user", content: text });
-  appendMessage("user", text);
+  appendMsg("🧠 正在提交任务...");
+  const res = await fetch(`${API_BASE}/api/generate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt, resolution, length })
+  });
+  const data = await res.json();
+  if (!data.taskId) return appendMsg("❌ 提交失败");
 
-  const aiBubble = appendMessage("ai", "");
-  chatHistory.push({ role: "ai", content: "" });
+  appendMsg(`✅ 任务提交成功，任务ID: ${data.taskId}`);
+  pollStatus(data.taskId);
+}
 
-  const url = `${API_BASE}/api/chat-stream?q=${encodeURIComponent(text)}`;
-  const eventSource = new EventSource(url);
-
-  eventSource.onmessage = (event) => {
-    if (event.data === "[DONE]") {
-      localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
-      eventSource.close();
+async function pollStatus(taskId) {
+  const interval = setInterval(async () => {
+    const res = await fetch(`${API_BASE}/api/status?taskId=${taskId}`);
+    const data = await res.json();
+    if (data.status === "completed") {
+      clearInterval(interval);
+      appendMsg("✅ 视频生成完成！");
+      appendMsg(`🎞️ 预览：${data.output.videoUrl}`);
+    } else if (data.status === "failed") {
+      clearInterval(interval);
+      appendMsg("❌ 视频生成失败");
     } else {
-      aiBubble.textContent += event.data;
-      chatHistory[chatHistory.length - 1].content = aiBubble.textContent;
-      chatBox.scrollTop = chatBox.scrollHeight;
+      appendMsg(`⏳ 状态：${data.status}...`);
     }
-  };
-
-  eventSource.onerror = () => {
-    aiBubble.textContent = "⚠️ 出错了，请重试";
-    eventSource.close();
-  };
-}
-
-function clearChat() {
-  chatHistory = [];
-  localStorage.removeItem("chatHistory");
-  chatBox.innerHTML = "";
-}
-
-function renderChatHistory() {
-  chatBox.innerHTML = "";
-  chatHistory.forEach((m) => appendMessage(m.role, m.content));
+  }, 3000);
 }

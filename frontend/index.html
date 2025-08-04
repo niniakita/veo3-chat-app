@@ -1,20 +1,25 @@
+
 <!DOCTYPE html>
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <title>Veo3 Chat</title>
+  <title>Veo3 视频生成</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="chat-container">
-    <div id="chatBox" class="chat-box"></div>
-    <div class="input-area">
-      <textarea id="userInput" placeholder="输入消息..."></textarea>
-      <button id="sendBtn">➤</button>
-    </div>
+  <div class="app">
+    <h1>🎬 Veo3 视频生成</h1>
     <div class="controls">
-      <button id="clearBtn">清空对话</button>
+      <input id="prompt" placeholder="请输入你的视频描述..." />
+      <select id="resolution">
+        <option value="720p">720p</option>
+        <option value="1080p" selected>1080p</option>
+        <option value="4K">4K</option>
+      </select>
+      <input id="length" type="number" min="3" max="20" value="8" />
+      <button onclick="generate()">生成视频</button>
     </div>
+    <div id="chat"></div>
   </div>
   <script src="app.js"></script>
 </body>
