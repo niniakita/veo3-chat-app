@@ -1,4 +1,3 @@
-
 import express from "express";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
@@ -10,12 +9,11 @@ app.use(cors());
 app.use(express.json());
 
 const API_KEY = process.env.VEO3_API_KEY;
-
 const API_URL = "https://pollo.ai/api/platform/generation/google/veo3";
 const STATUS_URL = "https://pollo.ai/api/platform/status";
 
 app.post("/api/generate", async (req, res) => {
-  const { prompt, negativePrompt = "", resolution = "1080p", length = 8, generateAudio = true } = req.body;
+  const { prompt, image = "", negativePrompt = "", resolution = "1080p", length = 8, generateAudio = true } = req.body;
 
   if (!prompt) {
     return res.status(400).json({ error: "缺少提示词 prompt" });
@@ -30,7 +28,7 @@ app.post("/api/generate", async (req, res) => {
       },
       body: JSON.stringify({
         input: {
-          image: "",
+          image,
           prompt,
           negativePrompt,
           length,
