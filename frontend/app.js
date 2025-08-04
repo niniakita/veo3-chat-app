@@ -1,4 +1,4 @@
-const API_BASE = "https://veo3-chat-app-production.up.railway.app";
+const API_BASE = "https://veo3-backend-production.up.railway.app"; // 修改为你的后端地址
 
 function appendMsg(content) {
   const div = document.createElement("div");
@@ -8,25 +8,19 @@ function appendMsg(content) {
 
 async function generate() {
   const prompt = document.getElementById("prompt").value;
-  const negativePrompt = document.getElementById("negativePrompt").value;
   const resolution = document.getElementById("resolution").value;
   const length = parseInt(document.getElementById("length").value);
   const generateAudio = document.getElementById("audio").checked;
 
-  if (!prompt) return alert("请输入内容");
+  if (!prompt) return alert("请输入提示词");
 
   appendMsg("🧠 正在提交任务...");
   const res = await fetch(`${API_BASE}/api/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      prompt,
-      negativePrompt,
-      resolution,
-      length,
-      generateAudio
-    })
+    body: JSON.stringify({ prompt, resolution, length, generateAudio })
   });
+
   const data = await res.json();
   if (!data.taskId) return appendMsg("❌ 提交失败");
 
@@ -41,12 +35,12 @@ async function pollStatus(taskId) {
     if (data.status === "completed") {
       clearInterval(interval);
       appendMsg("✅ 视频生成完成！");
-      appendMsg(`🎞️ 预览链接: ${data.output.videoUrl}`);
+      appendMsg(`🎞️ 预览链接：${data.output.videoUrl}`);
     } else if (data.status === "failed") {
       clearInterval(interval);
       appendMsg("❌ 视频生成失败");
     } else {
-      appendMsg(`⏳ 当前状态: ${data.status}...`);
+      console.log("⏳ 状态：", data.status);
     }
   }, 3000);
 }

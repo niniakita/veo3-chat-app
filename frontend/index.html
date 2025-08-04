@@ -1,44 +1,26 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8">
-  <title>Veo3 视频生成助手</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Veo3 视频生成</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8f9fa; }
+    #chat div { margin: 10px 0; }
+    input, select, button { margin: 5px 0; padding: 8px; width: 100%; }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🎬 Veo3 视频生成助手</h1>
-
-    <textarea id="prompt" placeholder="请输入提示词，例如：一只在东京飞翔的猫咪驾驶飞船" rows="3"></textarea>
-    <textarea id="negativePrompt" placeholder="负面提示词（可选，例如：模糊、低质量）" rows="2"></textarea>
-
-    <div class="controls">
-      <label>分辨率:
-        <select id="resolution">
-          <option value="720p">720p</option>
-          <option value="1080p" selected>1080p</option>
-          <option value="4k">4K</option>
-        </select>
-      </label>
-      <label>时长:
-        <select id="length">
-          <option value="4">4 秒</option>
-          <option value="8" selected>8 秒</option>
-          <option value="12">12 秒</option>
-        </select>
-      </label>
-      <label>
-        <input type="checkbox" id="audio" checked />
-        生成音频
-      </label>
-    </div>
-
-    <button onclick="generate()">🚀 生成视频</button>
-
-    <div id="chat" class="chat-box"></div>
-  </div>
-
+  <h2>🎬 Veo3 视频生成器</h2>
+  <input id="prompt" placeholder="请输入视频内容描述 prompt" />
+  <select id="resolution">
+    <option value="480p">480p</option>
+    <option value="720p">720p</option>
+    <option value="1080p" selected>1080p</option>
+  </select>
+  <input id="length" type="number" placeholder="视频时长（秒）" value="8" />
+  <label><input id="audio" type="checkbox" checked /> 生成音频</label>
+  <button onclick="generate()">提交任务</button>
+  <div id="chat"></div>
   <script src="app.js"></script>
 </body>
 </html>
