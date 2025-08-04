@@ -1,5 +1,5 @@
 {
-  "name": "veo3-backend",
+  "name": "veo3-video-backend",
   "version": "1.0.0",
   "main": "server.js",
   "type": "module",
