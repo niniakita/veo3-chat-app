@@ -1,4 +1,4 @@
-const API_BASE = "https://YOUR_RAILWAY_DOMAIN.up.railway.app"; 
+const API_BASE = "https://veo3-chat-app-production.up.railway.app";
 const chatBox = document.getElementById("chatBox");
 const input = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
