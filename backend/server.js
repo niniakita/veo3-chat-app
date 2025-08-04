@@ -18,11 +18,13 @@ app.post("/api/chat", async (req, res) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${API_KEY}`
+        "x-api-key": API_KEY
       },
       body: JSON.stringify({
-        model: "veo3",
-        messages: [{ role: "user", content: message }]
+        prompt: message,
+        duration: 8,
+        resolution: "1280x720",
+        stream: false
       })
     });
     const data = await veoRes.json();
@@ -46,12 +48,13 @@ app.get("/api/chat-stream", async (req, res) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${API_KEY}`
+        "x-api-key": API_KEY
       },
       body: JSON.stringify({
-        model: "veo3",
-        stream: true,
-        messages: [{ role: "user", content: message }]
+        prompt: message,
+        duration: 8,
+        resolution: "1280x720",
+        stream: true
       })
     });
 
